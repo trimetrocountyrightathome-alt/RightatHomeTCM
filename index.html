@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Opening the RAH App...</title>
+<style>
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background: #0f1115;
+    color: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .card {
+    padding: 32px 24px;
+    max-width: 380px;
+  }
+  .spinner {
+    width: 40px; height: 40px;
+    margin: 0 auto 20px;
+    border: 3px solid rgba(255,255,255,0.15);
+    border-top-color: #4f8cff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  h1 { font-size: 18px; font-weight: 600; margin: 0 0 8px; }
+  p { font-size: 14px; color: #a8adb8; margin: 0 0 24px; line-height: 1.5; }
+  a.btn {
+    display: inline-block;
+    background: #4f8cff;
+    color: #fff;
+    text-decoration: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="spinner" id="spinner"></div>
+    <h1 id="title">Opening in the RAH app…</h1>
+    <p id="subtitle">If nothing happens, tap the button below.</p>
+    <a class="btn hidden" id="manualLink" href="#">Open the RAH App</a>
+  </div>
+
+  <script>
+    // ---- YOUR LINKS ----
+    const IOS_SCHEME_URL = "encappture121://?code=deepLink-23630Tewgh&eventID=23630&menuID=219705";
+    const ANDROID_URL = "https://admin.encappture.com/encappture121?eventID=23630&code=deepLink-23630Tewgh&menuID=219705";
+    // ----------------------
+
+    function isIOS() {
+      return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    }
+
+    function isAndroid() {
+      return /Android/.test(navigator.userAgent);
+    }
+
+    const manualLink = document.getElementById("manualLink");
+    const spinner = document.getElementById("spinner");
+    const title = document.getElementById("title");
+    const subtitle = document.getElementById("subtitle");
+
+    function showManualFallback(href, label) {
+      spinner.classList.add("hidden");
+      title.textContent = "Ready when you are";
+      subtitle.textContent = "Tap below to continue.";
+      manualLink.href = href;
+      manualLink.textContent = label;
+      manualLink.classList.remove("hidden");
+    }
+
+    if (isAndroid()) {
+      window.location.href = ANDROID_URL;
+      setTimeout(() => showManualFallback(ANDROID_URL, "Open Encappture"), 1500);
+
+    } else if (isIOS()) {
+      let didHide = false;
+      window.addEventListener("pagehide", () => { didHide = true; });
+      window.addEventListener("blur", () => { didHide = true; });
+
+      window.location.href = IOS_SCHEME_URL;
+
+      setTimeout(() => {
+        if (!didHide) {
+          window.location.href = IOS_APP_STORE_URL;
+        }
+      }, 1500);
+
+      setTimeout(() => showManualFallback(IOS_APP_STORE_URL, "Get the app"), 2000);
+
+    } else {
+      showManualFallback(ANDROID_URL, "Continue");
+    }
+  </script>
+</body>
+</html>
